@@ -253,9 +253,9 @@ CephaloHRNet/
 
 ## Acknowledgements
 
-- [HRNet](https://github.com/HRNet/HRNet-Image-Classification) — original high-resolution network architecture
-- [CEPHA29](https://www.kaggle.com/datasets/felixtemko/cepha29) — cephalometric landmark dataset
-- [Adaptive Wing Loss](https://github.com/tankrant/AW-Loss) — robust heatmap regression loss
+- [HRNet](https://github.com/HRNet/HRNet-Facial-Landmark-Detection) — original high-resolution network architecture
+- [CEPHA29](https://github.com/manwaarkhd/CEPHA29) — cephalometric landmark dataset
+- [aariz](https://github.com/manwaarkhd/aariz) — cephalometric landmark dataset
 
 ---
 
