@@ -1,0 +1,46 @@
+# ── Virtual environments ──────────────────────────────────────────────
+Cepha-env/
+venv/
+env/
+.venv/
+*.egg-info/
+
+# ── Python cache ──────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ── Dataset (too large for git) ───────────────────────────────────────
+Dataset/
+data/raw/
+
+# ── Model weights & checkpoints ───────────────────────────────────────
+*.pt
+*.pth
+*.ckpt
+*.pkl
+# Allow the pretrained placeholder note if you add one
+!assets/*.pt.keep
+
+# ── Training outputs ──────────────────────────────────────────────────
+runs/
+
+# ── Jupyter ───────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── IDEs ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── OS ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Misc ──────────────────────────────────────────────────────────────
+read.txt
+*.log
+*.tmp

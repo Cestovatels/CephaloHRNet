@@ -1,0 +1,66 @@
+# ────────────────────────────────────────────────────────────────────
+# HRNet Cephalometric – Default Configuration
+# Override any key via command-line argument: --lr 5e-4 --batch 4
+# ────────────────────────────────────────────────────────────────────
+
+# ── Data ─────────────────────────────────────────────────────────────
+data: Dataset
+workers: 0                   # DataLoader workers (0 = main process)
+
+# ── Model ─────────────────────────────────────────────────────────────
+model: hrnet_w32             # hrnet_w32 | hrnet_w48
+pretrained: false            # load ImageNet pretrained weights (needs timm)
+
+# ── Training ──────────────────────────────────────────────────────────
+epochs: 200
+batch: 8
+imgsz: 512                   # input image resolution (square)
+seed: 42
+
+# ── Optimizer ─────────────────────────────────────────────────────────
+optimizer: AdamW             # AdamW | Adam | SGD
+lr: 0.001
+min_lr: 0.000001
+warmup_epochs: 5
+lr_scheduler: cosine         # cosine | step | onecycle
+weight_decay: 0.0001
+momentum: 0.9
+grad_clip: 1.0
+
+# ── Loss ──────────────────────────────────────────────────────────────
+loss: awing                  # awing | mse
+sigma: 3.0                   # Gaussian heatmap sigma (heatmap pixels)
+
+# ── Augmentation ──────────────────────────────────────────────────────
+no_augment: false
+rotation: 15.0               # max rotation angle (degrees)
+scale_low: 0.85
+scale_high: 1.15
+
+# ── Annotations ───────────────────────────────────────────────────────
+use_senior: false            # use Senior Orthodontist labels
+average_ann: false           # average Junior + Senior labels (best quality)
+
+# ── Hardware ──────────────────────────────────────────────────────────
+device: ""                   # "" = auto | "cpu" | "0" (GPU id)
+amp: false                   # automatic mixed precision
+
+# ── Output ────────────────────────────────────────────────────────────
+project: runs/train
+name: exp
+save_period: 10              # save epoch checkpoint every N epochs
+patience: 50                 # early stopping patience (0 = disabled)
+
+# ────────────────────────────────────────────────────────────────────
+# Recommended configurations:
+#
+# Fast baseline (CPU/low VRAM):
+#   model: hrnet_w32, batch: 4, imgsz: 384, epochs: 150
+#
+# Best results (8+ GB VRAM):
+#   model: hrnet_w48, batch: 8, imgsz: 512, epochs: 300
+#   pretrained: true, amp: true, average_ann: true, loss: awing
+#
+# Quick experiment:
+#   model: hrnet_w32, batch: 8, imgsz: 512, epochs: 50, patience: 20
+# ────────────────────────────────────────────────────────────────────
