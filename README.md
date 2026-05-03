@@ -22,7 +22,7 @@ Single command to train, evaluate, and predict — works on CEPHA29 or any custo
 
 ---
 
-## Highlights
+## ✨ Highlights
 
 - **HRNet-W32 & W48** — high-resolution parallel branch architecture
 - **Adaptive Wing Loss** (AWing) + AMP mixed-precision training
@@ -33,7 +33,7 @@ Single command to train, evaluate, and predict — works on CEPHA29 or any custo
 
 ---
 
-## Results
+## 📊 Results
 
 Evaluated on **CEPHA29** (150 test images, Senior Orthodontist annotations):
 
@@ -45,7 +45,7 @@ Evaluated on **CEPHA29** (150 test images, Senior Orthodontist annotations):
 
 ---
 
-## Installation
+## 🛠️ Installation
 
 ```bash
 git clone https://github.com/Cestovatels/CephaloHRNet.git
@@ -62,7 +62,7 @@ pip install -r requirements.txt
 
 ---
 
-## Dataset Structure
+## 📁 Dataset Structure
 
 ### CEPHA29 (built-in support)
 
@@ -108,9 +108,9 @@ python train.py --data MyDataset --annotators labels --img-dir images
 
 ---
 
-## Usage
+## 🚀 Usage
 
-### Training
+### 🏋️ Training
 
 ```bash
 # Quick start — HRNet-W32
@@ -145,7 +145,7 @@ After training, `best.pt` is automatically evaluated on the validation split.
 | `best.pt` | ~254 MB | inference / evaluation |
 | `last.pt` | ~762 MB | resume training |
 
-### Evaluation
+### 🧪 Evaluation
 
 ```bash
 # Test split
@@ -169,7 +169,7 @@ Results are saved to `runs/test/<name>_exp/` or `runs/valid/<name>_exp/`:
 | `confusion_matrix.png` | Landmark swap matrix |
 | `predictions.png` | Sample overlay images |
 
-### Prediction
+### 🔍 Prediction
 
 ```bash
 # Predictions only
@@ -198,7 +198,7 @@ Results saved to `runs/predict/<name>_exp/`.
 
 ---
 
-## Output Structure
+## 📂 Output Structure
 
 ```
 runs/
@@ -214,7 +214,7 @@ runs/
 
 ---
 
-## Key Arguments
+## ⚙️ Key Arguments
 
 | Argument | Default | Description |
 |----------|---------|-------------|
@@ -233,7 +233,7 @@ runs/
 
 ---
 
-## Project Structure
+## 🗂️ Project Structure
 
 ```
 CephaloHRNet/
@@ -257,7 +257,7 @@ CephaloHRNet/
 
 ---
 
-## Acknowledgements
+## 🙏 Acknowledgements
 
 - [HRNet](https://github.com/HRNet/HRNet-Facial-Landmark-Detection) — original high-resolution network architecture
 - [CEPHA29](https://github.com/manwaarkhd/CEPHA29) — cephalometric landmark dataset
@@ -265,6 +265,6 @@ CephaloHRNet/
 
 ---
 
-## License
+## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
