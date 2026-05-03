@@ -1,54 +1,80 @@
-# CephaloHRNet — Cephalometric Landmark Detection
+<div align="center">
 
-A clean, end-to-end PyTorch implementation of **HRNet** for cephalometric landmark detection.  
-Designed for easy use with any dataset that follows the described structure.
+# CephaloHRNet
 
-- HRNet-W32 and HRNet-W48 variants
-- Adaptive Wing Loss (AWing) + AMP training
-- Full evaluation pipeline: MRE, SDR, F1, PR curve, confusion matrix
-- YOLO-style CLI — single command to train, test, or predict
+**End-to-end cephalometric landmark detection with HRNet**
+
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Dataset: CEPHA29](https://img.shields.io/badge/Dataset-CEPHA29-orange)](https://www.kaggle.com/datasets/felixtemko/cepha29)
+
+A clean, production-ready PyTorch implementation of **HRNet-W32/W48** for cephalometric landmark detection.  
+Single command to train, evaluate, and predict — works on CEPHA29 or any custom dataset.
+
+</div>
 
 ---
 
-## Results (CEPHA29 — Senior Orthodontists)
+## Highlights
 
-| Model | Epochs | MRE (mm) | SDR @ 2mm | SDR @ 2.5mm | SDR @ 3mm | SDR @ 4mm |
-|-------|--------|----------|-----------|-------------|-----------|-----------|
-| HRNet-W48 | 73 | 1.37 | 80.83% | 87.20% | 91.15% | 95.08% |
+- **HRNet-W32 & W48** — high-resolution parallel branch architecture
+- **Adaptive Wing Loss** (AWing) + AMP mixed-precision training
+- **Generic dataset loader** — single or multi-annotator (averages coordinates automatically)
+- **Full evaluation suite** — MRE, SDR, F1 curve, PR curve, confusion matrix, detection matrix
+- **Auto-organized outputs** — `runs/train/`, `runs/valid/`, `runs/test/`, `runs/predict/`
+- **YOLO-style CLI** — all hyperparameters via command line, no config editing needed
+
+---
+
+## Results
+
+Evaluated on **CEPHA29** (150 test images, Senior Orthodontist annotations):
+
+| Model | Epochs | MRE (mm) ↓ | SDR @ 2mm ↑ | SDR @ 2.5mm ↑ | SDR @ 3mm ↑ | SDR @ 4mm ↑ |
+|:-----:|:------:|:----------:|:-----------:|:-------------:|:-----------:|:-----------:|
+| HRNet-W48 | 73 | **1.37** | 80.83% | 87.20% | 91.15% | 95.08% |
+
+> Training is still in progress (300 epochs total). Results will be updated.
 
 ---
 
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/CephaloHRNet.git
+git clone https://github.com/Cestovatels/CephaloHRNet.git
 cd CephaloHRNet
+
 python -m venv venv
-venv\Scripts\activate          # Windows
-# source venv/bin/activate     # Linux / macOS
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Linux / macOS
+
 pip install -r requirements.txt
 ```
 
-> **GPU note:** Install the CUDA-enabled PyTorch build from [pytorch.org](https://pytorch.org/get-started/locally/) before running `pip install -r requirements.txt`.
+> **GPU:** Install the CUDA-enabled PyTorch build from [pytorch.org](https://pytorch.org/get-started/locally/) **before** running pip install.
 
 ---
 
 ## Dataset Structure
 
+### CEPHA29 (built-in support)
+
 ```
 Dataset/
-├── cephalogram_machine_mappings.csv   # pixel_size per image (optional)
+├── cephalogram_machine_mappings.csv     ← pixel size per image (optional)
 ├── train/
-│   ├── Cephalograms/                  # .png / .jpg / .bmp images
+│   ├── Cephalograms/                    ← .png / .jpg / .bmp
 │   └── Annotations/
 │       └── Cephalometric Landmarks/
-│           ├── Junior Orthodontists/  # *.json
-│           └── Senior Orthodontists/  # *.json  ← default
-├── valid/   (same structure)
-└── test/    (same structure)
+│           ├── Junior Orthodontists/    ← *.json
+│           └── Senior Orthodontists/   ← *.json  (default)
+├── valid/
+└── test/
 ```
 
-Each JSON annotation:
+Each annotation file (`<image_id>.json`):
+
 ```json
 {
   "ceph_id": "image_id",
@@ -64,8 +90,8 @@ Each JSON annotation:
 ```
 MyDataset/
 ├── train/
-│   ├── images/
-│   └── labels/      # *.json — same format, file stem = image stem
+│   ├── images/       ← any supported image format
+│   └── labels/       ← *.json, same format, filename = image stem
 ├── valid/
 └── test/
 ```
@@ -76,25 +102,25 @@ python train.py --data MyDataset --annotators labels --img-dir images
 
 ---
 
-## Training
+## Usage
+
+### Training
 
 ```bash
-# HRNet-W32, quick start
+# Quick start — HRNet-W32
 python train.py --data Dataset --model hrnet_w32 --epochs 200 --batch 8 --amp --device cuda
 
-# HRNet-W48, best config
+# Best config — HRNet-W48 with pretrained backbone
 python train.py \
   --data Dataset \
   --model hrnet_w48 \
   --epochs 300 \
   --batch 8 \
-  --imgsz 512 \
   --lr 5e-4 \
   --loss awing \
   --amp \
   --device cuda \
   --pretrained-path hrnetv2_w48_imagenet_pretrained.pth \
-  --project runs/train \
   --name my_exp
 
 # Average Junior + Senior annotations
@@ -102,98 +128,102 @@ python train.py --data Dataset \
   --annotators "Junior Orthodontists" "Senior Orthodontists" \
   --model hrnet_w48 --epochs 300 --amp
 
-# Resume from checkpoint
+# Resume training
 python train.py --data Dataset --resume runs/train/my_exp/last.pt
 ```
 
-Training automatically evaluates `best.pt` on the validation split when finished.  
-Checkpoints saved to `runs/train/<name>/`:
-- `best.pt` — best validation MRE (model weights only, ~254 MB for W48)
-- `last.pt` — last epoch, full checkpoint for resuming (~762 MB for W48)
+After training, `best.pt` is automatically evaluated on the validation split.
 
----
+| Checkpoint | Size (W48) | Use |
+|-----------|-----------|-----|
+| `best.pt` | ~254 MB | inference / evaluation |
+| `last.pt` | ~762 MB | resume training |
 
-## Evaluation
+### Evaluation
 
 ```bash
-# Test split (default)
+# Test split
 python test.py --weights runs/train/my_exp/best.pt --data Dataset
 
 # Validation split
 python test.py --weights runs/train/my_exp/best.pt --data Dataset --split valid
 ```
 
-Results saved to `runs/test/<name>_exp/` or `runs/valid/<name>_exp/`:
+Results are saved to `runs/test/<name>_exp/` or `runs/valid/<name>_exp/`:
 
-| File | Description |
-|------|-------------|
-| `results.json` | MRE, SDR summary |
+| Output file | Description |
+|-------------|-------------|
+| `results.json` | MRE & SDR summary |
 | `per_landmark_mre.png` | Per-landmark error bar chart |
-| `sdr.png` | SDR at 2 / 2.5 / 3 / 4 mm |
+| `sdr.png` | SDR at 2 / 2.5 / 3 / 4 mm thresholds |
 | `error_dist.png` | Error histogram + KDE |
-| `f1_curve.png` | F1 vs threshold |
+| `f1_curve.png` | F1 score vs distance threshold |
 | `pr_curve.png` | Precision–Recall curve |
 | `detection_matrix.png` | Per-landmark × threshold heatmap |
 | `confusion_matrix.png` | Landmark swap matrix |
 | `predictions.png` | Sample overlay images |
 
----
-
-## Prediction
+### Prediction
 
 ```bash
 # Predictions only
-python predict.py --weights runs/train/my_exp/best.pt --source Dataset/test/Cephalograms
+python predict.py --weights runs/train/my_exp/best.pt --source path/to/images
 
-# With Ground Truth overlay (predicted = colored dot, GT = green ring, error = yellow line)
+# With Ground Truth overlay
 python predict.py \
   --weights runs/train/my_exp/best.pt \
   --source Dataset/test/Cephalograms \
   --gt-dir "Dataset/test/Annotations/Cephalometric Landmarks/Senior Orthodontists"
 
-# Save coordinates to CSV
+# Export coordinates to CSV
 python predict.py --weights runs/train/my_exp/best.pt \
   --source Dataset/test/Cephalograms --save-csv
 ```
 
 Results saved to `runs/predict/<name>_exp/`.
 
+**Overlay legend:**
+
+| Visual | Meaning |
+|--------|---------|
+| Colored filled circle | Predicted landmark |
+| Green ring | Ground truth landmark |
+| Yellow line | Error between prediction and GT |
+
+---
+
+## Output Structure
+
+```
+runs/
+├── train/
+│   └── my_exp/              ← best.pt, last.pt, training curves
+├── valid/
+│   └── my_exp_exp/          ← evaluation results & plots
+├── test/
+│   └── my_exp_exp/
+└── predict/
+    └── my_exp_exp/          ← annotated images
+```
+
 ---
 
 ## Key Arguments
 
-### `train.py`
-
 | Argument | Default | Description |
 |----------|---------|-------------|
-| `--data` | `Dataset` | Dataset root |
+| `--data` | `Dataset` | Dataset root directory |
 | `--model` | `hrnet_w32` | `hrnet_w32` or `hrnet_w48` |
 | `--epochs` | `200` | Training epochs |
 | `--batch` | `8` | Batch size |
-| `--lr` | `1e-3` | Learning rate |
+| `--lr` | `1e-3` | Initial learning rate |
 | `--loss` | `awing` | `awing` or `mse` |
-| `--amp` | flag | FP16 mixed precision |
-| `--annotators` | `Senior Orthodontists` | Annotation directories (1 = direct use, 2+ = averaged) |
-| `--img-dir` | `Cephalograms` | Image subdirectory |
+| `--amp` | flag | FP16 automatic mixed precision |
+| `--annotators` | `Senior Orthodontists` | Annotation directories (multiple = averaged) |
+| `--img-dir` | `Cephalograms` | Image subdirectory name |
 | `--pretrained-path` | — | Local `.pth` pretrained backbone |
 | `--resume` | — | Resume from `last.pt` |
-
-### `test.py`
-
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `--weights` | required | Checkpoint path |
-| `--split` | `test` | `train` / `valid` / `test` |
-| `--name` | auto | Output folder name |
-
-### `predict.py`
-
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `--weights` | required | Checkpoint path |
-| `--source` | required | Image or folder |
-| `--gt-dir` | — | Annotation folder for GT overlay |
-| `--save-csv` | flag | Export coordinates to CSV |
+| `--patience` | `50` | Early stopping patience (0 = off) |
 
 ---
 
@@ -201,26 +231,34 @@ Results saved to `runs/predict/<name>_exp/`.
 
 ```
 CephaloHRNet/
-├── train.py              # Training script
-├── test.py               # Evaluation script
-├── predict.py            # Inference script
+├── train.py              ← training script
+├── test.py               ← evaluation script
+├── predict.py            ← inference script
 ├── data/
-│   ├── dataset.py        # CephaloDataset — generic loader
-│   └── transforms.py     # Augmentation pipeline
+│   ├── dataset.py        ← generic dataset loader
+│   └── transforms.py     ← augmentation pipeline
 ├── models/
-│   └── hrnet.py          # HRNet-W32 / W48
+│   └── hrnet.py          ← HRNet-W32 / W48
 ├── utils/
-│   ├── losses.py         # AdaptiveWingLoss, MSEHeatmapLoss
-│   ├── metrics.py        # MRE, SDR, decode helpers
-│   ├── visualize.py      # All plot functions
-│   └── logger.py         # CSV + console logger
+│   ├── losses.py         ← AdaptiveWingLoss, MSEHeatmapLoss
+│   ├── metrics.py        ← MRE, SDR, coordinate helpers
+│   ├── visualize.py      ← all plot functions
+│   └── logger.py         ← CSV + console logger
 ├── configs/
-│   └── default.yaml      # Default hyperparameters
+│   └── default.yaml      ← default hyperparameters
 └── requirements.txt
 ```
 
 ---
 
+## Acknowledgements
+
+- [HRNet](https://github.com/HRNet/HRNet-Image-Classification) — original high-resolution network
+- [CEPHA29](https://www.kaggle.com/datasets/felixtemko/cepha29) — cephalometric landmark dataset
+- [Adaptive Wing Loss](https://github.com/tankrant/AW-Loss) — robust heatmap regression loss
+
+---
+
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+This project is licensed under the [MIT License](LICENSE).
