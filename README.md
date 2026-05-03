@@ -9,6 +9,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Dataset: CEPHA29](https://img.shields.io/badge/Dataset-CEPHA29-orange)](https://www.kaggle.com/datasets/felixtemko/cepha29)
 
+[![GitHub Stars](https://img.shields.io/github/stars/Cestovatels/CephaloHRNet?style=flat&logo=github&color=yellow)](https://github.com/Cestovatels/CephaloHRNet/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/Cestovatels/CephaloHRNet?style=flat&logo=github&color=blue)](https://github.com/Cestovatels/CephaloHRNet/forks)
+[![GitHub Issues](https://img.shields.io/github/issues/Cestovatels/CephaloHRNet?style=flat&logo=github&color=red)](https://github.com/Cestovatels/CephaloHRNet/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/Cestovatels/CephaloHRNet?style=flat&logo=github&color=brightgreen)](https://github.com/Cestovatels/CephaloHRNet/commits/main)
+[![Repo Size](https://img.shields.io/github/repo-size/Cestovatels/CephaloHRNet?style=flat&logo=github&color=lightgrey)](https://github.com/Cestovatels/CephaloHRNet)
+
 A clean, production-ready PyTorch implementation of **HRNet-W32/W48** for cephalometric landmark detection.  
 Single command to train, evaluate, and predict — works on CEPHA29 or any custom dataset.
 
